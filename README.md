@@ -1,6 +1,8 @@
 # daily-info-push
 
-自包含的每日信息推送脚本。从 26 个数据源抓取 → LLM 精选排榜 → 飞书群推送。
+[English](README_en.md) | 中文
+
+每天从 Hacker News、GitHub Trending、arXiv、Nature 等 26 个科技与学术数据源并行抓取最新内容，经三层去重后交由 LLM 精选排榜，最终将高质量信息摘要推送到飞书群。目标是用一条消息替代手动刷多个信息源，帮助团队零成本保持对技术趋势和前沿研究的关注。全流程自包含，配好 API key 即可通过 cron 定时运行，无需额外基础设施。
 
 ## 流程
 
@@ -138,3 +140,7 @@ PATH=/usr/local/bin:/usr/bin:/bin:/home/<user>/.local/bin:/home/<user>/.cargo/bi
 ## 依赖
 
 httpx (HTTP) / feedparser (RSS) / litellm (LLM API) / pydantic (结构化输出)
+
+## 许可证
+
+[MIT](LICENSE)

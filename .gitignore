@@ -12,7 +12,6 @@ build/
 .venv/
 venv/
 env/
-uv.lock
 
 # IDE / Editor
 .vscode/
@@ -37,8 +36,6 @@ temp/
 # Data & output
 *.csv
 *.json
-!package.json
-!tsconfig.json
 !*.example.json
 !*.instructions.json
 output/

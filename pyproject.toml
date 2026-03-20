@@ -1,10 +1,20 @@
 [project]
 name = "daily-info-push"
 version = "0.1.0"
+description = "Self-contained daily information push: 26 sources → LLM curation → Feishu group push"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
+authors = [
+    { name = "codefishx" },
+]
 dependencies = [
     "httpx[http2]>=0.27.0",
     "feedparser>=6.0.0",
     "pydantic>=2.0",
     "litellm>=1.60.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/codefishx/daily-info-push"
+Repository = "https://github.com/codefishx/daily-info-push"
