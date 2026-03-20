@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+uv.lock
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+
+# Logs & temp
+*.log
+tmp/
+temp/
+
+# Data & output
+*.csv
+*.json
+!package.json
+!tsconfig.json
+!*.example.json
+!*.instructions.json
+output/
