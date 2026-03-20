@@ -69,7 +69,7 @@ def main() -> None:
 
     # 1. 抓取 + 去重
     logger.info("Step 1: 开始抓取数据")
-    items, failed_sources = fetch_all(args.date, args.edition, data_dir)
+    items, failed_sources, num_to_orig = fetch_all(args.date, args.edition, data_dir)
     if not items:
         print("今日无数据")
         return
@@ -79,7 +79,8 @@ def main() -> None:
     digest_path = data_dir / "raw" / f"{prefix}_digest.md"
     digest = digest_path.read_text(encoding="utf-8")
     history_titles = load_history_titles(data_dir / "history", args.date)
-    result = curate(digest, history_titles)
+    valid_ids = {item.id for item in items}
+    result = curate(digest, history_titles, num_to_orig, valid_ids)
     curated_items = flatten_curation(result)
     if not curated_items:
         print("LLM 未返回精选结果")

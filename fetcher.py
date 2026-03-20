@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+import os
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from adapters import get_adapters
@@ -18,7 +20,8 @@ from models import (
 
 logger = logging.getLogger()
 
-ABSTRACT_MAX_LEN = 200
+ABSTRACT_MAX_LEN = 500
+ABSTRACT_MAX_LEN_PAPER = 800
 
 
 def _format_metrics(raw_metrics: dict[str, object]) -> str:
@@ -34,31 +37,49 @@ def _truncate(text: str, max_len: int) -> str:
     return text[:max_len] + "..."
 
 
-def _generate_digest(items: list[RawItem], digest_path: Path, date_str: str) -> None:
-    """生成按源分组的 markdown digest，供 LLM 精选使用。"""
+def _generate_digest(
+    items: list[RawItem], digest_path: Path, date_str: str
+) -> dict[str, str]:
+    """生成按源分组的 markdown digest，供 LLM 精选使用。
+
+    返回 num_to_orig 映射 (数字ID → 原始ID)。
+    """
+    # 建立数字 ID 映射
+    orig_to_num: dict[str, str] = {}
+    num_to_orig: dict[str, str] = {}
+    for idx, item in enumerate(items, start=1):
+        num_id = str(idx)
+        orig_to_num[item.id] = num_id
+        num_to_orig[num_id] = item.id
+
     groups: dict[str, list[RawItem]] = defaultdict(list)
     for item in items:
         groups[item.source_name].append(item)
 
-    lines: list[str] = [f"# 候选摘要 {date_str} — 共 {len(items)} 条\n"]
+    lines: list[str] = [f"共 {len(items)} 条候选，来自 {len(groups)} 个数据源\n"]
 
     for source, group in groups.items():
-        lines.append(f"## {source} — {len(group)} 条\n")
+        lines.append(f"## {source}（{len(group)} 条）\n")
         for it in group:
+            meta_parts = [it.source_type]
             metrics = _format_metrics(it.raw_metrics)
+            if metrics:
+                meta_parts.append(metrics)
             tags = it.tags or []
-            tag_str = f" [{', '.join(tags)}]" if tags else ""
-            abstract = _truncate(it.abstract, ABSTRACT_MAX_LEN)
-            abstract_part = f" — {abstract}" if abstract else ""
-            metrics_part = f" {metrics}" if metrics else ""
-            lines.append(
-                f"- `{it.id}` **{it.title}** ({it.source_type})"
-                f"{metrics_part}{tag_str}{abstract_part}"
-            )
-        lines.append("")
+            if tags:
+                meta_parts.append(f"标签: {', '.join(tags)}")
+            meta_str = " | ".join(meta_parts)
+            max_len = ABSTRACT_MAX_LEN_PAPER if it.source_type == "Paper" else ABSTRACT_MAX_LEN
+            abstract = _truncate(it.abstract, max_len)
+            lines.append(f"- `[{orig_to_num[it.id]}]` **{it.title}** ({meta_str})")
+            if abstract:
+                lines.append(f"  {abstract}")
+            lines.append("")
 
     digest_path.parent.mkdir(parents=True, exist_ok=True)
     digest_path.write_text("\n".join(lines), encoding="utf-8")
+    logger.info("ID 映射: %d 个数字ID已生成", len(num_to_orig))
+    return num_to_orig
 
 
 def fetch_all(
@@ -66,8 +87,8 @@ def fetch_all(
     edition: str | None,
     data_dir: Path,
     history_days: int = 5,
-) -> tuple[list[RawItem], list[str]]:
-    """抓取所有数据源并去重，返回 (去重后的 items, 失败的数据源列表)。
+) -> tuple[list[RawItem], list[str], dict[str, str]]:
+    """抓取所有数据源并去重，返回 (去重后的 items, 失败的数据源列表, num_to_orig 映射)。
 
     同时写入 raw JSONL 和 digest markdown 到 data_dir。
     """
@@ -82,22 +103,29 @@ def fetch_all(
     source_counts: dict[str, int] = {}
     failed_sources: list[str] = []
 
-    for adapter in get_adapters():
-        t0 = time.time()
-        try:
-            items = adapter.fetch_with_retry()
-            elapsed = time.time() - t0
-            logger.info("[%s] 成功 — %d 条, 耗时 %.2fs", adapter.name, len(items), elapsed)
-            source_counts[adapter.name] = len(items)
-            all_items.extend(items)
-        except Exception:
-            elapsed = time.time() - t0
-            logger.exception("[%s] 失败 — 耗时 %.2fs", adapter.name, elapsed)
-            failed_sources.append(adapter.name)
+    max_workers = int(os.environ.get("ADAPTER_CONCURRENCY", 8))
+    adapters = get_adapters()
+    logger.info("并行抓取: %d 个适配器, max_workers=%d", len(adapters), max_workers)
+    t_start = time.time()
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(adapter.fetch_with_retry): adapter for adapter in adapters}
+        for future in as_completed(futures):
+            adapter = futures[future]
+            try:
+                items = future.result()
+                logger.info("[%s] 成功 — %d 条", adapter.name, len(items))
+                source_counts[adapter.name] = len(items)
+                all_items.extend(items)
+            except Exception:
+                logger.exception("[%s] 失败", adapter.name)
+                failed_sources.append(adapter.name)
+
+    logger.info("并行抓取完成, 总耗时 %.2fs", time.time() - t_start)
 
     if not all_items:
         logger.warning("所有适配器均未返回数据")
-        return [], failed_sources
+        return [], failed_sources, {}
 
     # 第一层：同批次跨源去重（id / url / title）
     seen_ids: set[str] = set()
@@ -146,16 +174,16 @@ def fetch_all(
 
     if not all_items:
         logger.warning("去重后无剩余数据")
-        return [], failed_sources
+        return [], failed_sources, {}
 
     # 写入 raw JSONL 和 digest
     write_jsonl(raw_path, all_items)
     digest_label = f"{date_str} ({edition})" if edition else date_str
-    _generate_digest(all_items, digest_path, digest_label)
+    num_to_orig = _generate_digest(all_items, digest_path, digest_label)
 
     logger.info(
         "抓取完成: 总计 %d 条, 跨源去重 %d, 历史去重 %d, 失败源 %d",
         len(all_items), cross_source_dedup, dedup_count, len(failed_sources),
     )
 
-    return all_items, failed_sources
+    return all_items, failed_sources, num_to_orig
