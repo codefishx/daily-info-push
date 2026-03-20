@@ -40,16 +40,27 @@ def validate_curation(result: CurationResult, valid_ids: set[str]) -> None:
         raise CurationValidationError("; ".join(errors))
 
 
-def build_prompt(digest_content: str, history_titles: list[str], rules_content: str) -> str:
+def _truncate(text: str, max_len: int = 30) -> str:
+    if len(text) <= max_len:
+        return text
+    return text[:max_len] + "..."
+
+
+def build_prompt(digest_content: str, history_titles: list[tuple[str, str]], rules_content: str) -> str:
     """拼接完整的精选 prompt。"""
-    titles_block = (
-        "\n".join(f"- {t}" for t in history_titles)
-        if history_titles
-        else "（无历史记录）"
-    )
+    if history_titles:
+        history_lines: list[str] = []
+        for title, abstract in history_titles:
+            if abstract:
+                history_lines.append(f"- {title} : {_truncate(abstract)}")
+            else:
+                history_lines.append(f"- {title}")
+        titles_block = "\n".join(history_lines)
+    else:
+        titles_block = "（无历史记录）"
     return f"""# 任务
 
-你是一个信息精选助手。请从当日候选内容中精选最值得关注的内容，按榜单组织，并为每条生成中文摘要。
+你是一个信息精选助手。请从当日待推送候选内容池中精选最值得关注的内容，按榜单组织，并为每条生成中文摘要。
 
 候选内容中每条 item 以 `[数字]` 标记唯一 ID（如 `[3]` 表示 id 为 `"3"`）。输出时 `id` 必须精确引用这些数字。
 
@@ -59,11 +70,11 @@ def build_prompt(digest_content: str, history_titles: list[str], rules_content: 
 
 # 历史记录
 
-以下是最近 5 天已推送的标题，用于语义去重，避免重复推送相同或高度相似的内容：
+以下是最近 5 天已推送的标题和摘要，用于语义去重，避免重复推送相同或高度相似的内容：
 
 {titles_block}
 
-# 当日候选内容
+# 当日待推送候选内容池
 
 {digest_content}"""
 
@@ -73,11 +84,16 @@ def curate(
     history_titles: list[str],
     num_to_orig: dict[str, str],
     valid_ids: set[str],
+    prompt_save_path: Path | None = None,
 ) -> CurationResult:
     """调用 LLM 执行精选，返回结构化结果。带退避重试（最多 3 次）。"""
     rules_path = Path(__file__).parent / "prompt.md"
     rules_content = rules_path.read_text(encoding="utf-8")
     prompt = build_prompt(digest_content, history_titles, rules_content)
+
+    if prompt_save_path:
+        prompt_save_path.write_text(prompt, encoding="utf-8")
+        logger.info("Prompt 已保存至 %s", prompt_save_path)
 
     model = os.environ.get("LLM_MODEL", "gemini/gemini-3.1-pro-preview")
     max_retries = 3
@@ -92,7 +108,6 @@ def curate(
                 response_format=CurationResult,
             )
 
-            # 优化 5: 记录 token 用量
             if hasattr(response, "usage") and response.usage:
                 logger.info(
                     "LLM token 用量: prompt=%d, completion=%d, total=%d",
@@ -103,7 +118,6 @@ def curate(
 
             result = CurationResult.model_validate_json(response.choices[0].message.content)
 
-            # 优化 4b: 恢复原始 ID（先用数字 ID 做校验）
             validate_curation(result, set(num_to_orig.keys()))
 
             for ranking_list in result.lists:
@@ -111,7 +125,6 @@ def curate(
                     if item.id in num_to_orig:
                         item.id = num_to_orig[item.id]
 
-            # 优化 3: 恢复 ID 后用原始 ID 做最终校验
             validate_curation(result, valid_ids | {"__summary__"})
 
             return result

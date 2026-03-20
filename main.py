@@ -80,7 +80,8 @@ def main() -> None:
     digest = digest_path.read_text(encoding="utf-8")
     history_titles = load_history_titles(data_dir / "history", args.date)
     valid_ids = {item.id for item in items}
-    result = curate(digest, history_titles, num_to_orig, valid_ids)
+    prompt_save_path = data_dir / "raw" / f"{prefix}_prompt.md"
+    result = curate(digest, history_titles, num_to_orig, valid_ids, prompt_save_path)
     curated_items = flatten_curation(result)
     if not curated_items:
         print("LLM 未返回精选结果")

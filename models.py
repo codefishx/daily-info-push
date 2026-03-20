@@ -159,18 +159,21 @@ def find_history_files(history_dir: str | Path, before_date: str, days: int = 5)
     return result
 
 
-def load_history_titles(history_dir: str | Path, before_date: str, days: int = 5) -> list[str]:
-    """从最近 days 天的历史 JSONL 文件中提取所有已推送的标题，用于 LLM 语义去重。"""
+def load_history_titles(history_dir: str | Path, before_date: str, days: int = 5) -> list[tuple[str, str]]:
+    """从最近 days 天的历史 JSONL 文件中提取已推送的标题和摘要，用于 LLM 语义去重。
+
+    返回 [(title, abstract), ...] 列表，abstract 为 LLM 生成的中文摘要。
+    """
     paths = find_history_files(history_dir, before_date, days)
-    titles: list[str] = []
+    results: list[tuple[str, str]] = []
     for p in paths:
         try:
             for item in read_jsonl(p):
                 if "title" in item:
-                    titles.append(item["title"])
+                    results.append((item["title"], item.get("abstract", "")))
         except Exception:
             continue
-    return titles
+    return results
 
 
 def load_history_ids(paths: list[str | Path]) -> tuple[set[str], set[str]]:

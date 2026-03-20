@@ -61,19 +61,19 @@ def _generate_digest(
     for source, group in groups.items():
         lines.append(f"## {source}（{len(group)} 条）\n")
         for it in group:
-            meta_parts = [it.source_type]
+            lines.append(f"- `[{orig_to_num[it.id]}]` **{it.title}**")
+            meta_parts = [f"类型: {it.source_type}"]
             metrics = _format_metrics(it.raw_metrics)
             if metrics:
                 meta_parts.append(metrics)
             tags = it.tags or []
             if tags:
-                meta_parts.append(f"标签: {', '.join(tags)}")
-            meta_str = " | ".join(meta_parts)
+                meta_parts.append(" ".join(f"#{t}" for t in tags))
+            lines.append(f"  {' | '.join(meta_parts)}")
             max_len = ABSTRACT_MAX_LEN_PAPER if it.source_type == "Paper" else ABSTRACT_MAX_LEN
             abstract = _truncate(it.abstract, max_len)
-            lines.append(f"- `[{orig_to_num[it.id]}]` **{it.title}** ({meta_str})")
             if abstract:
-                lines.append(f"  {abstract}")
+                lines.append(f"  摘要: {abstract}")
             lines.append("")
 
     digest_path.parent.mkdir(parents=True, exist_ok=True)
