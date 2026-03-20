@@ -7,7 +7,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
-from adapters import ADAPTERS
+from adapters import get_adapters
 from models import (
     RawItem,
     find_history_files,
@@ -82,7 +82,7 @@ def fetch_all(
     source_counts: dict[str, int] = {}
     failed_sources: list[str] = []
 
-    for adapter in ADAPTERS:
+    for adapter in get_adapters():
         t0 = time.time()
         try:
             items = adapter.fetch_with_retry()
