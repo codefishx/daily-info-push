@@ -12,7 +12,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_DAYS_BACK = 30
+_DEFAULT_DAYS_BACK = 60
 _DEFAULT_MIN_STARS = 1000
 _DEFAULT_LIMIT = 5
 _SEARCH_URL = "https://api.github.com/search/repositories"
