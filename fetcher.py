@@ -12,7 +12,7 @@ from pathlib import Path
 from adapters import get_adapters
 from models import (
     RawItem,
-    find_history_files,
+    find_all_history_files,
     load_history_ids,
     make_run_prefix,
     write_jsonl,
@@ -86,7 +86,6 @@ def fetch_all(
     date_str: str,
     edition: str | None,
     data_dir: Path,
-    history_days: int = 5,
 ) -> tuple[list[RawItem], list[str], dict[str, str]]:
     """抓取所有数据源并去重，返回 (去重后的 items, 失败的数据源列表, num_to_orig 映射)。
 
@@ -152,11 +151,11 @@ def fetch_all(
         logger.info("跨源去重移除 %d 条（剩余 %d 条）", cross_source_dedup, len(unique_items))
     all_items = unique_items
 
-    # 第二层：历史去重（id / url）
+    # 第二层：历史去重（id / url）— 使用全部历史记录
     dedup_count = 0
-    history_paths = find_history_files(data_dir / "history", date_str, days=history_days)
+    history_paths = find_all_history_files(data_dir / "history", date_str)
     if history_paths:
-        logger.info("自动发现 %d 个历史文件", len(history_paths))
+        logger.info("自动发现 %d 个历史文件（全量）", len(history_paths))
         hist_ids, hist_urls = load_history_ids(history_paths)
         logger.info(
             "加载历史去重集合: %d 个 id, %d 个 url (来自 %d 个文件)",

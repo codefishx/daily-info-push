@@ -159,6 +159,29 @@ def find_history_files(history_dir: str | Path, before_date: str, days: int = 5)
     return result
 
 
+def find_all_history_files(history_dir: str | Path, before_date: str) -> list[Path]:
+    """查找 history_dir 下 before_date 之前（不含当天）的所有 JSONL 文件。
+
+    用于程序判定去重，加载全部历史记录。
+    """
+    from datetime import date
+
+    history_dir = Path(history_dir)
+    if not history_dir.is_dir():
+        return []
+
+    cutoff = date.fromisoformat(before_date)
+    result: list[Path] = []
+    for f in sorted(history_dir.glob("*.jsonl")):
+        file_date = f.stem[:10]
+        try:
+            if date.fromisoformat(file_date) < cutoff:
+                result.append(f)
+        except ValueError:
+            continue
+    return result
+
+
 def load_history_titles(history_dir: str | Path, before_date: str, days: int = 5) -> list[tuple[str, str]]:
     """从最近 days 天的历史 JSONL 文件中提取已推送的标题和摘要，用于 LLM 语义去重。
 

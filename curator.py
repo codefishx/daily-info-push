@@ -108,6 +108,8 @@ def curate(
                 response_format=CurationResult,
             )
 
+            assert isinstance(response, )
+
             if hasattr(response, "usage") and response.usage:
                 logger.info(
                     "LLM token 用量: prompt=%d, completion=%d, total=%d",
