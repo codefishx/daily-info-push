@@ -267,7 +267,7 @@ dependencies = [
 requires-dist = [
     { name = "feedparser", specifier = ">=6.0.0" },
     { name = "httpx", extras = ["http2"], specifier = ">=0.27.0" },
-    { name = "litellm", specifier = ">=1.60.0" },
+    { name = "litellm", specifier = "<=1.82.4" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
