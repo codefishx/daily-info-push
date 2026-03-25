@@ -2,7 +2,7 @@
 
 [English](README_en.md) | 中文
 
-每天从 Hacker News、GitHub Trending、arXiv、Nature 等 26 个科技与学术数据源并行抓取最新内容，经三层去重后交由 LLM 精选排榜，最终将高质量信息摘要推送到飞书群。目标是用一条消息替代手动刷多个信息源，帮助团队零成本保持对技术趋势和前沿研究的关注。全流程自包含，配好 API key 即可通过 cron 定时运行，无需额外基础设施。
+每天从 Hacker News、GitHub Trending、arXiv、Nature、TechCrunch、虎嗅、界面新闻等 37 个科技与学术数据源并行抓取最新内容，经三层去重后交由 LLM 精选排榜，最终将高质量信息摘要推送到飞书群。目标是用一条消息替代手动刷多个信息源，帮助团队零成本保持对技术趋势和前沿研究的关注。全流程自包含，配好 API key 即可通过 cron 定时运行，无需额外基础设施。
 
 ## 流程
 
@@ -42,7 +42,7 @@ merger.py        raw + curated 合并
 pusher.py        飞书 OpenAPI 推送
 models.py        数据模型 + JSONL 工具
 prompt.md        精选规则/prompt 模板
-adapters/        26 个数据源适配器
+adapters/        37 个数据源适配器
 ```
 
 ## 数据目录 (`~/.daily-info-push/`)

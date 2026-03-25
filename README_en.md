@@ -2,7 +2,7 @@
 
 English | [中文](README.md)
 
-Fetches the latest content in parallel from 26 tech and academic sources — Hacker News, GitHub Trending, arXiv, Nature, and more — deduplicates across three layers, then uses an LLM to curate and rank the highlights into a digest pushed to Feishu (Lark) group chats. The goal is to replace manually browsing multiple feeds with a single message, helping teams stay on top of tech trends and cutting-edge research at zero effort. Fully self-contained — just configure your API keys and schedule via cron, no extra infrastructure needed.
+Fetches the latest content in parallel from 37 tech and academic sources — Hacker News, GitHub Trending, arXiv, Nature, TechCrunch, The Verge, and more — deduplicates across three layers, then uses an LLM to curate and rank the highlights into a digest pushed to Feishu (Lark) group chats. The goal is to replace manually browsing multiple feeds with a single message, helping teams stay on top of tech trends and cutting-edge research at zero effort. Fully self-contained — just configure your API keys and schedule via cron, no extra infrastructure needed.
 
 ## How It Works
 
@@ -42,7 +42,7 @@ merger.py        Merge raw + curated results
 pusher.py        Feishu OpenAPI push
 models.py        Data models + JSONL utilities
 prompt.md        Curation rules / prompt template
-adapters/        26 data source adapters
+adapters/        37 data source adapters
 ```
 
 ## Data Directory (`~/.daily-info-push/`)

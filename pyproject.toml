@@ -1,7 +1,7 @@
 [project]
 name = "daily-info-push"
 version = "0.1.0"
-description = "Self-contained daily information push: 26 sources → LLM curation → Feishu group push"
+description = "Self-contained daily information push: 37 sources → LLM curation → Feishu group push"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"

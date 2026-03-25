@@ -38,6 +38,17 @@ from adapters.import_ai import ImportAIAdapter
 from adapters.nautilus import NautilusAdapter
 from adapters.sspai import SspaiAdapter
 from adapters.ft import FTAdapter
+from adapters.infoq_cn import InfoQCNAdapter
+from adapters.jiemian import JiemianAdapter
+from adapters.huxiu import HuxiuAdapter
+from adapters.geekpark import GeekParkAdapter
+from adapters.jiqizhixin import JiqizhixinAdapter
+from adapters.ifanr import IfanrAdapter
+from adapters.anthropic_blog import AnthropicBlogAdapter
+from adapters.deepmind_blog import DeepMindBlogAdapter
+from adapters.techcrunch import TechCrunchAdapter
+from adapters.the_verge import TheVergeAdapter
+from adapters.ars_technica import ArsTechnicaAdapter
 
 _ADAPTER_CLASSES = [
     GitHubTrendingAdapter,
@@ -67,6 +78,17 @@ _ADAPTER_CLASSES = [
     NautilusAdapter,
     SspaiAdapter,
     FTAdapter,
+    InfoQCNAdapter,
+    JiemianAdapter,
+    HuxiuAdapter,
+    GeekParkAdapter,
+    JiqizhixinAdapter,
+    IfanrAdapter,
+    AnthropicBlogAdapter,
+    DeepMindBlogAdapter,
+    TechCrunchAdapter,
+    TheVergeAdapter,
+    ArsTechnicaAdapter,
 ]
 
 
