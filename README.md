@@ -99,7 +99,7 @@ cat ~/.daily-info-push/logs/$(date +%F)_morning.log
 
 ### 4. 配置 crontab
 
-北京时间 = UTC+8。早上 8:00 = UTC 0:00，晚上 19:00 = UTC 11:00。
+北京时间 = UTC+8。早上 8:00 = UTC 0:00。
 
 ```bash
 crontab -e
@@ -113,15 +113,11 @@ PATH=/usr/local/bin:/usr/bin:/bin:/home/<user>/.local/bin:/home/<user>/.cargo/bi
 
 # 每日早报 — 北京时间 08:00 (UTC 00:00)
 0 0 * * * /home/<user>/daily-info-push/run.sh morning
-
-# 每日晚报 — 北京时间 19:00 (UTC 11:00)
-0 11 * * * /home/<user>/daily-info-push/run.sh evening
 ```
 
 > **注意**：将 `<user>` 替换为实际用户名。如果服务器时区已设为 `Asia/Shanghai`，则直接用北京时间：
 > ```cron
 > 0 8 * * * /home/<user>/daily-info-push/run.sh morning
-> 0 19 * * * /home/<user>/daily-info-push/run.sh evening
 > ```
 >
 > 查看/设置时区：`timedatectl` / `sudo timedatectl set-timezone Asia/Shanghai`
@@ -132,7 +128,6 @@ PATH=/usr/local/bin:/usr/bin:/bin:/home/<user>/.local/bin:/home/<user>/.cargo/bi
 
 ```
 ~/.daily-info-push/logs/2026-03-20_morning.log
-~/.daily-info-push/logs/2026-03-20_evening.log
 ```
 
 每次运行会追加写入（`>>`），不会覆盖历史日志。

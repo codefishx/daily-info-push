@@ -97,7 +97,7 @@ cat ~/.daily-info-push/logs/$(date +%F)_morning.log
 
 ### 4. Configure crontab
 
-Beijing time = UTC+8. 8:00 AM = UTC 0:00, 7:00 PM = UTC 11:00.
+Beijing time = UTC+8. 8:00 AM = UTC 0:00.
 
 ```bash
 crontab -e
@@ -111,15 +111,11 @@ PATH=/usr/local/bin:/usr/bin:/bin:/home/<user>/.local/bin:/home/<user>/.cargo/bi
 
 # Daily morning edition — Beijing 08:00 (UTC 00:00)
 0 0 * * * /home/<user>/daily-info-push/run.sh morning
-
-# Daily evening edition — Beijing 19:00 (UTC 11:00)
-0 11 * * * /home/<user>/daily-info-push/run.sh evening
 ```
 
 > **Note**: Replace `<user>` with your actual username. If your server timezone is set to `Asia/Shanghai`, use Beijing time directly:
 > ```cron
 > 0 8 * * * /home/<user>/daily-info-push/run.sh morning
-> 0 19 * * * /home/<user>/daily-info-push/run.sh evening
 > ```
 >
 > Check/set timezone: `timedatectl` / `sudo timedatectl set-timezone Asia/Shanghai`
@@ -130,7 +126,6 @@ Log path: `~/.daily-info-push/logs/{date}_{edition}.log`, e.g.:
 
 ```
 ~/.daily-info-push/logs/2026-03-20_morning.log
-~/.daily-info-push/logs/2026-03-20_evening.log
 ```
 
 Each run appends (`>>`) and does not overwrite previous logs.

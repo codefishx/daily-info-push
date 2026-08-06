@@ -16,7 +16,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_LIMIT = 5
+_DEFAULT_LIMIT = 4
 _DEFAULT_MAX_AGE_DAYS = 2
 _FEED_URL = "https://feedx.net/rss/jiemian.xml"
 

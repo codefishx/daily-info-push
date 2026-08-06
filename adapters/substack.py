@@ -21,6 +21,7 @@ from models import RawItem
 
 _DEFAULT_MAX_AGE_DAYS = 3
 _DEFAULT_LIMIT_PER_FEED = 2
+_DEFAULT_TOTAL_LIMIT = 6
 _DEFAULT_FEEDS = [
     "https://simonwillison.net/atom/everything/",
     "https://www.astralcodexten.com/feed",
@@ -46,6 +47,7 @@ class SubstackAdapter(BaseAdapter):
     def __init__(self) -> None:
         self.max_age_days = int(os.environ.get("SUBSTACK_MAX_AGE_DAYS", _DEFAULT_MAX_AGE_DAYS))
         self.limit_per_feed = int(os.environ.get("SUBSTACK_LIMIT_PER_FEED", _DEFAULT_LIMIT_PER_FEED))
+        self.total_limit = int(os.environ.get("SUBSTACK_TOTAL_LIMIT", _DEFAULT_TOTAL_LIMIT))
         feeds_env = os.environ.get("SUBSTACK_FEEDS", "")
         self.feeds = [u.strip() for u in feeds_env.split(",") if u.strip()] if feeds_env else _DEFAULT_FEEDS
 
@@ -64,6 +66,8 @@ class SubstackAdapter(BaseAdapter):
                     continue
                 count = 0
                 for entry in feed.entries:
+                    if len(items) >= self.total_limit:
+                        return items
                     if count >= self.limit_per_feed:
                         break
                     published_at = self._parse_date(entry)

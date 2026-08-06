@@ -16,7 +16,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_LIMIT = 5
+_DEFAULT_LIMIT = 4
 _DEFAULT_MAX_AGE_DAYS = 3
 _FEED_URL = "https://www.huxiu.com/rss/0.xml"
 

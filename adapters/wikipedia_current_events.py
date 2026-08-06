@@ -17,7 +17,7 @@ from adapters.base import BaseAdapter
 from models import RawItem
 
 _API_URL = "https://en.wikipedia.org/w/api.php"
-_DEFAULT_LIMIT = 15
+_DEFAULT_LIMIT = 10
 _DEFAULT_LIMIT_PER_CATEGORY = 2
 
 _KNOWN_CATEGORIES = [

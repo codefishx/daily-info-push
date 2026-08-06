@@ -13,6 +13,21 @@ from models import CurationResult
 
 logger = logging.getLogger()
 
+LIST_ITEM_RANGES: dict[str, tuple[int, int]] = {
+    "main": (5, 12),
+    "ai_cs": (0, 3),
+    "opensource": (0, 2),
+    "product": (0, 3),
+    "business": (0, 3),
+    "economy": (0, 2),
+    "macro": (0, 2),
+    "biotech_med": (0, 2),
+    "science": (0, 2),
+    "tool": (0, 2),
+    "hot": (0, 2),
+    "notable": (0, 2),
+}
+
 
 class CurationValidationError(Exception):
     """LLM 输出数据质量校验失败。"""
@@ -32,10 +47,14 @@ def validate_curation(result: CurationResult, valid_ids: set[str]) -> None:
             if item.id in seen_ids:
                 errors.append(f"重复 ID: {item.id}")
             seen_ids.add(item.id)
-    # 检查综合榜条目数
-    main_lists = [l for l in result.lists if l.list_id == "main"]
-    if main_lists and len(main_lists[0].items) < 5:
-        errors.append(f"综合榜仅 {len(main_lists[0].items)} 条，低于最低要求 5 条")
+        item_range = LIST_ITEM_RANGES.get(ranking_list.list_id)
+        if item_range:
+            min_items, max_items = item_range
+            if not min_items <= len(ranking_list.items) <= max_items:
+                errors.append(
+                    f"榜单 {ranking_list.list_id} 共 {len(ranking_list.items)} 条，"
+                    f"不符合 {min_items}～{max_items} 条要求"
+                )
     if errors:
         raise CurationValidationError("; ".join(errors))
 

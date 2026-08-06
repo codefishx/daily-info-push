@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # daily-info-push 定时任务包装脚本
-# 用法: ./run.sh [morning|evening]
+# 用法: ./run.sh morning
 
 set -euo pipefail
 

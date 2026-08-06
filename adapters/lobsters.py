@@ -10,7 +10,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_LIMIT = 5
+_DEFAULT_LIMIT = 4
 _DEFAULT_MIN_SCORE = 5
 _HOTTEST_URL = "https://lobste.rs/hottest.json"
 

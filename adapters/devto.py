@@ -11,7 +11,7 @@ from adapters.base import BaseAdapter
 from models import RawItem
 
 _DEFAULT_TOP_DAYS = 1
-_DEFAULT_LIMIT = 5
+_DEFAULT_LIMIT = 4
 _API_URL = "https://dev.to/api/articles"
 
 

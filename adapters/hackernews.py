@@ -14,7 +14,7 @@ from models import RawItem
 _DEFAULT_HOURS_BACK = 26
 _DEFAULT_MIN_POINTS = 50
 _DEFAULT_MIN_COMMENTS = 10
-_DEFAULT_LIMIT = 6
+_DEFAULT_LIMIT = 5
 _SEARCH_URL = "https://hn.algolia.com/api/v1/search"
 _HN_ITEM_URL = "https://news.ycombinator.com/item?id="
 

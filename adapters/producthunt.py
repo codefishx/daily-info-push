@@ -11,7 +11,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_LIMIT = 4
+_DEFAULT_LIMIT = 3
 _GRAPHQL_URL = "https://api.producthunt.com/v2/api/graphql"
 
 _QUERY = """

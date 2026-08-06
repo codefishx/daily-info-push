@@ -15,7 +15,7 @@ from models import RawItem
 
 _CATEGORIES = ["business", "technology", "general", "science", "health"]
 _DEFAULT_PER_CATEGORY_LIMIT = 3
-_DEFAULT_TOTAL_LIMIT = 10  # 0 表示不限制
+_DEFAULT_TOTAL_LIMIT = 6  # 0 表示不限制
 _DEFAULT_COUNTRY = "us"
 _API_URL = "https://newsapi.org/v2/top-headlines"
 

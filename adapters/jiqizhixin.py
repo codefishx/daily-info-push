@@ -15,7 +15,7 @@ import httpx
 from adapters.base import BaseAdapter
 from models import RawItem
 
-_DEFAULT_LIMIT = 5
+_DEFAULT_LIMIT = 4
 _DEFAULT_MAX_AGE_DAYS = 2
 _BASE_URL = "https://www.jiqizhixin.com"
 _LIST_URL = "https://www.jiqizhixin.com/"
