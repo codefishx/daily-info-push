@@ -26,6 +26,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+DEPLOYMENT.local.md
 
 
 # Logs & temp

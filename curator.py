@@ -14,18 +14,18 @@ from models import CurationResult
 logger = logging.getLogger()
 
 LIST_ITEM_RANGES: dict[str, tuple[int, int]] = {
-    "main": (5, 12),
-    "ai_cs": (0, 3),
-    "opensource": (0, 2),
-    "product": (0, 3),
-    "business": (0, 3),
-    "economy": (0, 2),
-    "macro": (0, 2),
-    "biotech_med": (0, 2),
-    "science": (0, 2),
-    "tool": (0, 2),
-    "hot": (0, 2),
-    "notable": (0, 2),
+    "main": (4, 8),
+    "ai_cs": (0, 2),
+    "opensource": (0, 1),
+    "product": (0, 2),
+    "business": (0, 2),
+    "economy": (0, 1),
+    "macro": (0, 1),
+    "biotech_med": (0, 1),
+    "science": (0, 1),
+    "tool": (0, 1),
+    "hot": (0, 1),
+    "notable": (0, 1),
 }
 
 
