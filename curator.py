@@ -114,7 +114,7 @@ def curate(
         prompt_save_path.write_text(prompt, encoding="utf-8")
         logger.info("Prompt 已保存至 %s", prompt_save_path)
 
-    model = os.environ.get("LLM_MODEL", "gemini/gemini-3.1-pro-preview")
+    model = os.environ.get("LLM_MODEL", "gemini/gemini-3.8-flash")
     max_retries = 3
     last_exc: Exception | None = None
 
@@ -125,6 +125,8 @@ def curate(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
                 response_format=CurationResult,
+                api_key=os.environ["GEMINI_API_KEY"],
+                reasoning_effort="high",
             )
 
             if hasattr(response, "usage") and response.usage:
