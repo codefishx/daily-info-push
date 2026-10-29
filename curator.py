@@ -114,7 +114,7 @@ def curate(
         prompt_save_path.write_text(prompt, encoding="utf-8")
         logger.info("Prompt 已保存至 %s", prompt_save_path)
 
-    model = os.environ.get("LLM_MODEL", "gemini/gemini-3.8-flash")
+    model = os.environ.get("LLM_MODEL", "gemini/gemini-4-argon")
     max_retries = 3
     last_exc: Exception | None = None
 
@@ -127,6 +127,8 @@ def curate(
                 response_format=CurationResult,
                 api_key=os.environ["GEMINI_API_KEY"],
                 reasoning_effort="high",
+                max_tokens=32768,
+                timeout=1200,
             )
 
             if hasattr(response, "usage") and response.usage:
